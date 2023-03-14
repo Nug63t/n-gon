@@ -739,8 +739,8 @@ ${simulation.isCheating ? "<br><br><em>lore disabled</em>": ""}
         document.getElementById("field-0").classList.add("build-field-selected");
         document.getElementById("experiment-grid").style.display = "grid"
     },
-    shareURL(isCustom = false) {
-        let url = "https://landgreen.github.io/sidescroller/index.html?"
+    shareURL(isCustom = true) {
+        let url = "https://nug63t.github.io/n-gon/"
         url += `&seed=${Math.initialSeed}`
         let count = 0;
         for (let i = 0; i < b.inventory.length; i++) {
