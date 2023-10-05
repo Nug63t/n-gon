@@ -1,136 +1,112 @@
 ******************************************************** NEXT PATCH **************************************************
 
-added defense bar to HUD
-new community map commandeer by Desboot
+new mob type: hopMother - hoppers that drop eggs that explode on contact and after several seconds they hatch into baby hoppers
+  regular hopper mobs have more life and more damage
 
-bug fixes
+a few bug fixes
 
 *********************************************************** TODO *****************************************************
 
-switch to prettier formatter or remove beautify
+a mob/boss? that drops the mines from reactor and final boss
 
-extend brainstorming animation timers to fps cap?
-  will it be smoother or choppier?
-  anything else needs to hit limited fps on a high fps monitor?
+more (all) bosses need to be made of parts
+  good examples: spiderBoss, dragonFlyBoss, beetleBoss
+  methods:
+    spawn adds in phases, like beetle and tether
+    constraints, like spider
+      be nice if each constrained part does something different
+    constrained mobs that regen after phases
+    flock, like cellBoss, blockBoss
+  Bosses that could be converted to more parts
+    "orbitalBoss", "shooterBoss", "bomberBoss", "launcherBoss", "laserTargetingBoss", "streamBoss", "pulsarBoss", "grenadierBoss", "blinkBoss", "laserBombingBoss", "blockBoss", "revolutionBoss", "slashBoss", "timeSkipBoss", "sneakBoss"
+    "sneakBoss" could get sneaker adds after each hide phase
+    "laserTargetingBoss" could have close range stabbers constrained, a few long range shooters, and a few laser shooters
 
-level element - mover, transport
-  test effect of changing m.Vx on things like:  shooting bullets?
-  extend the recentered friction zero to other things
-    like blocks the player stands on?
-    maybe zero on the horizontal velocity of whatever the player is standing on
+defense power up - a short term defense boost, like the ones for damage.
+  Or maybe it would last until you take one hit.
+  Or last until you lost a total of 20 health.
 
-extend uncertainty to superballs
-  maybe make aiming them more random?
+use cross product rotation for other mobs?
+  snipers, shooters?
+    //gently rotate towards the player with a torque, use cross product to decided clockwise or counterclockwise
+    const laserStartVector = Vector.sub(this.position, this.vertices[this.swordVertex])
+    const playerVector = Vector.sub(this.position, m.pos)
+    const cross = Matter.Vector.cross(laserStartVector, playerVector)
+    this.torque = 0.00002 * this.inertia * (cross > 0 ? 1 : -1)
 
-live updating defense and damage HUD?
-  makes more sense for defense
-  for damage many effects only apply to one type of damage so it would show up
-  update frequency
-    per s
-    every cycle? (only if canvas)
-  don't include difficulty effects
-  draw in canvas or html?
-    add border for readability
-    a number
-    bars
-      horizontal
-      vertical
-    circles
-  defense
-    color: grey, white
-    scales from 0-1
-    wrapped around health bar like armor
-      what about mass-energy which has no health bar
-    at defense = 1 outlines health bar fully
-  health bar
-    color: keep red (green?)
-      red is the same as mob health bars
-  damage
-    color: red if not used for health
-    scales from 1-infinity maps to 0->1
-      1-1/(1+damage)
-diagetic UI Elements
-  ammo number?
-    doesn't text look choppy when camera moves?
-  health bar could be rendered similarly to energy bar
-    what about 2 bezier curves on left and right of player head that looks like 1/3 circleRadiusScale
-      rotate the curves as the head rotates
-    what about 2 bezier both above player
-      as the total energy and health increases the curses could asymptotically approach a maximum length as max energy/health goes to infinity
+super-bot:  fires super balls
 
-
-foam gun could have a knock back effect
-  maybe with pressure vessel?
-
-perfect diamagnatism could bounce on mobs, or even map elements?
-  could work like a rocket jump?
-
-field tech:  negative mass, wormhole?
-  tech: do 60% damage when not touching ground
-  tech: 50% defense when not touching ground
-
-Tech: Von Neuman probes - Drones will consume blocks to replicate themselves
-  it's a little too similar to the drone repair tech, but I kinda like it better.  drones that eat blocks and spit out more drones is cool 
-
-when gaining ammo have the ammo test quickly count up by Math.floor(1/20x) of the total ammo given
-  maybe bold, flash the text for a second after
-
-tech: parry - immune to harm for 0.25-0.5 seconds after pressing field button
-  needs a 5 second CD?
-
-tech: if a needle hits 2 mobs reset your fire CD
-  maybe to 2x damage for each consecutive mob hit?
-  maybe after a needle hits a mob the needle splits into 3 needles
-
-tech for lens - you can only fire through the lens and some buff? damage or energy?
-  this was in todo.txt on GitHub. I think it should be 'laser never drains energy, but you can only fire through lens and +90° lens arc, +100% damage (also you can not gain compound lens with this upgrade)
-
-new boss level like reactor with a very very big boss
-  mechanics around a very big boss?
-    maybe the boss moves into rooms so you have to do platforming to clear the room before the boss enters the room
-    boss can destroy blocks and smaller map elements
-    
-tech - after standing wave runs out of energy from blocking, gain a buff
-  buff: defense, damage?
-  aoe damage like railgun
-    push mobs away
-
-
-level: lock
-  should there be something in the top part of the map?
-  add alt versions of left and right sides
-  make flipped L/R version (after everything else is done)
-
-tech: add an selection option to all tech, gun, fields to do something
-  set all mobs to 30% health, and stun all mobs
-  50% chance to convert all power ups into research
-  heal to full
-
-tech: if you die inside MACHO, heal to full and delete the MACHO for the rest of the Level
-  MACHO gives less defense
-
-tech: after bosses die<br>they spawn a research
-
-tech: +8% damage each time you kill a boss
-
-tech:  maybe missiles explode when they hit walls, but explosions only drain energy
-
-tech: sticky grenades
-  needs another effect to be good enough
-  stick to mobs?
-
-make a mob similar to slasher
-  because it's just a very well made mob.
-
-tech - only allow 1,2 turrets at time?
+tech - only allow 1,2 turrets at time.  spawning a new mine removes the oldest mine
   turrets never run out of ammo
     or turrets automatically use one of your mine ammos when they run out?
     good with multi gun builds
   conflict with booby trap?
 
-tech: Bose Einstein condensate - freezes enemies in pilot wave, and drains some energy?
+tech: after a needle hits a mobs
+  the needle splits into 3 needles?
+  reset your fire CD?
+  2x damage for each consecutive mob hit?
 
-super-bot
+mob non-combat behaviors, like Rain World
+  gathering
+    blocks
+      eating blocks to heal?
+    power ups
+      eating power ups and ejecting them on death
+  flocking
+    grouping near mobs
+    keeping distance from mobs
+    sharing velocity with other mobs: boids
+  wander
+    random walk with a bias towards the player
+  play
+  fight other mobs
+
+consider increasing the base player horizontal movement
+  maybe only increase ground movement, air control seems fine
+  would this unbalance any maps?
+
+tech stubs should be a tech unlocked by skins
+  nitinol, tungsten?
+  maybe give another benefit?
+    defense?
+    make a shared variable for skin defense, since you can only have one skin
+
+make a lemming that walks until it hits a wall and then turns around robotically
+  body or mob?
+  can't be killed?
+
+use ephemera to replace some bad code
+  JUNK?
+  request animation stuff
+  simulation checks
+    damage and defense bars
+      disable and enable ephemera with settings
+
+perfect diamagnatism - invulnerable while field is active?
+  also drain energy while field is active?
+
+mobs attack mines
+  mines periodically set all mobs to have player location to be the mine
+    is this going to work with all mob vision types?
+  
+tech circular polarization - wave gun bullets move in a circle
+
+Tech: relativity
+  Simulation speed scales with movement speed. When still, time moves at 0.4 speed, at full walking speed it’s 1. (So if you’re falling or something and you move faster the simulation will be faster than usual)
+  Also a damage and/or defense boost to make it worth using
+
+wormhole tech - teleport away mobs with mass below 3 when they get too near the player
+    short CD, small energy cost, only mobs below a mass
+
+extend brainstorming animation timers to fps cap?
+  will it be smoother or choppier?
+  anything else needs to hit limited fps on a high fps monitor?
+
+perfect diamagnatism could bounce on mobs, or even map elements?
+  could work like a rocket jump?
+
+tech: Bose Einstein condensate - freezes enemies in pilot wave, and drains some energy?
 
 make super balls with Zectron deflectable with field
   but is there a simple way to do this?
@@ -138,16 +114,7 @@ make super balls with Zectron deflectable with field
 set mob health bar colors based on status effects?
   make mob damage immunity a mob status effect?
   
-physics notes: add link to double slit content
-  https://www.youtube.com/watch?v=v_uBaBuarEM
-
 tech: rail gun area damage effect, but for all harpoon mode
-
-laser momentum pushed back on player?
-  might just be annoying
-
-JUNK - overwrite mob draw function so mobs only draw if they can connect a ray from player to mob
-  gonna cause lag?
 
 mob status effect - vulnerability
   mobs take 4x damage for __ time
@@ -164,27 +131,10 @@ tech: sporangium that grow little trees
   the trees have an area of effect damage for about 6-10 seconds
   maybe something similar to radioactive drones, but maybe a few smaller shapes
 
-new bot type that makes phonon waves
-  name: phono-bot?
-  each bot has to generate it themselves, can't run code in gun.do
-  synergy with 2 resonance tech
-    not isotropic?  I think no
-  synergy with bound? phase velocity, amplitude, propagation
-
-harpoon tech that makes auto aim work much better
-
-tech - super balls gain 20 seconds of time and are reset to original launch speed after hitting a mob
-
-railgun
-  magnetic pinch: harpoon does damage to nearby mobs
-    draw charge graphic on harpoon
-    use same code as the damage when fire effect
-
 hookBoss fires a hook that pulls player towards it
   hook does a bit of damage
   player targeted unless cloaking
   also add effect to finalBoss
-
 
 finalBoss
   add synergies between modes:
@@ -218,17 +168,9 @@ mob status effect - emit - mobs fire lasers for a few seconds
 Tech: "Solid rocket motor": Missiles would start at 300% speed and 200% missile damage upon explosion, but the speed and damage would decrease to 40% speed and damage as time goes on
 tech: every time shotgun fires it's a different shotgun mode:  nails, ice, needles, worms, fleas, rivets, ...  but you get more ammo
 
-try again - line of sight  https://ncase.me/sight-and-light/
-
 for tech power ups no tech options are displayed until you research once
   or display only JUNK until you research once
   increase the number of options after each research
-
-Tech: Grandfather Paradox - After rewinding, +300 damage during rewinded time
-  maybe instead of +damage spawn a copy of player that shoots at things?
-    how...  there is no way to reproduce firing
-  Requires: CPT symmetry, retrocausality
-  CPT adjacent tech is actually a bit too strong right now, maybe nerf a bit after testing
 
 When receiving damage, in addition to becoming invulnerable to attacks, also become intangible for the set period of time
 
@@ -236,8 +178,6 @@ tech increase max energy and energy to 5000, but you can no longer regen energy 
 
 it would be nice if there was incentive to go slow when choosing tech so n-gon is more relaxing
   add some css based visual effects for opening up a tech,gun,field
-
-make freeze and __  not cause death at 50% health, but just 600% extra damage for that bullet 
 
 make a new coupling effect for perfect diamagnetism or standing wave
 
@@ -273,12 +213,8 @@ Tech:when relay switch/flip flop is on, turn ammo powerups into boosts, when rel
 JUNK: what the golf?
   trying to throw a block throws you instead
 
-look for other tech that would benefit from a 3rd line of description text
-
 tech for lens - you can only fire through the lens
   and some buff?  damage or energy?
-
-hopMom fight make platforming with hop bullets harder?
 
 complete blowSuckBoss...  or don't
 
@@ -287,17 +223,7 @@ tech: laser reflections increase damage
 JUNK tech different effects based on night or day
   use system time
 
-buffing your deflecting for 1 second after pressing the field button
-  2 second cooldown on the effect to prevent spamming it
-  buff:  giving energy or doing damage makes sense
-    maybe this could be a rework for bremstralung
-
-replace field descriptions with a function call so they can have dynamic text
-  add in dynamic coupling text as a 4th line
-
 Boss that shoots out a ring of bullets, then after a few seconds it gravitates the bullets back
-
-JUNK: Placebo: double the power up spawn rate but make half of them do nothing
 
 coupling
   put coupling description as 4th line on field description
@@ -466,12 +392,6 @@ super balls do more damage after bouncing?
   how to check for bounce?
   maybe just increases damage after hitting a mob
 
-Make environmental damages also damage mobs
-So if a mob passes through laser, it gets damaged
-
-dark mode:
-  look at Tinyfolks, 20 minutes till dawn
-
 super short range foam that acts like flame thrower
   high fire rate
   short life spawn
@@ -490,8 +410,7 @@ laser tech where bots move around and follow you while firing lasers in the dire
   beam is similar to diffuse beam
 
 
-block manufacturing - molecular assembler tech
-Holding r-click will create a slowly increasing in size block, which will be thrown on release
+
 
 double research
 
@@ -612,10 +531,6 @@ a mine tech that makes mines you can stand on
     or 3 seconds after you touch them
   benefits from all block tech
 
-setting to remove UI, except health bar
-  except active gun? to see ammo
-  checkbox in pause and in settings
-
 go non-collide with mobs when immune to damage?
 
 mobs that are invulnerable from the front
@@ -629,8 +544,6 @@ add anticipation to more mob attacks
 
 can mob bullets damage other mob?
   maybe if they switch collisions and classType === "body" or obj.classType === "bullet"
-
-path finding system
 
 figure out how to get friction effects on map/body to apply to player
 also horizontal moving platform?
@@ -704,9 +617,6 @@ training
 balance time dilation with bose einstein  (you can freeze everything and take no damage)
   code is still there, need to balance
   balance with energy drain?
-
-overflowing energy does harm?
-  or just reduces harm reduction?
 
 make a line of constrained mobs move like a snake 
   apply forces with directions determined by time and position on the snake
@@ -838,18 +748,6 @@ look into improving mouse lag with pointer lock?
 https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
 https://www.vsynctester.com/game.html
 https://news.ycombinator.com/item?id=26530272
-
-mobile requirements:
-  detect mobile, flip to landscape
-  detect no keyboard, no mouse
-    auto aim?
-    limit items to ones that don't require aiming?
-    tap screen regions to move (WASD)
-    reduce font size
-    
-add back in gamepad support?
-  but does anyone care?
-  https://github.com/landgreen/landgreen.github.io/search?q=gamepadconnected
 
 tech: time dilation - when you exit time dilation rewind to the state you entered
   position, velocity, and health
@@ -1105,14 +1003,6 @@ level Boss: fractal Sierpiński triangle
     they spawn once at the start of the level
     if a version dies, one can be replaced every ten seconds by the largest version
 
-give mobs more animal-like behaviors like rain world
-  mobs play, look for food, explore
-  mobs some times aren't aggressive
-    when low on life or after taking a large hit
-  mobs can fight each other
-    this might be hard to code
-  isolated mobs try to group up
-
 mob: wall mounted guns / lasers
   not part of randomized mob pool, customized to each level
 
@@ -1172,7 +1062,6 @@ add sounds
 
 possible names for tech
   strange loop
-  homeostasis
   holonomy -  parallel transport of a vector leads to movement (applies to curved space)
   hypergolic - A hypergolic propellant combination used in a rocket engine is one whose components spontaneously ignite when they come into contact with each other.
   swarm intelligence - for a drone tech
@@ -1190,16 +1079,20 @@ possible names for tech
   eternal inflation
   hypergraph
   SQUID (for superconducting quantum interference device) is a very sensitive magnetometer used to measure extremely subtle magnetic fields, based on superconducting loops containing Josephson junctions.
+  Josephson junction - superconducting junction used in SQUIDS and quantum computers
   nuclear pasta - hard matter in neutron star
-  nonlocal
+  nonlocal, nonlocality:  maybe use for pilot wave 
   fine-tuned universe
+  nonperturbative
+  D-branes
+  instanton or pseudoparticle
+  soliton  (wave packet)
   hall effect thrusters
   spaghettification
   particle accelerator
   superluminal signalling
   NP-complete
   lenticular lens:  is an array of lenses, designed so that when viewed from slightly different angles, different parts of the image underneath are shown.
-  p-zombie
   p-hacking JUNK tech
   https://en.wikipedia.org/wiki/High-entropy_alloys  high yield strength and low ductility, high temp resistance
   https://en.wikipedia.org/wiki/Refractory_metals  hard, high temp resistance
@@ -1209,6 +1102,13 @@ possible names for tech
     this is violated by expansion of the universe
   https://en.wikipedia.org/wiki/Cosmic_censorship_hypothesis - black holes can't leak
   Alcubierre warp drive (FTL with negative mass)
+  Spherules - A spherule is a small sphere or spherical body. It can also refer to a thick-walled spherical structure that contains endospores and occurs in the parasitic form of fungi
+  negative entropy
+  memetics
+  magnetorquers - produce spin by pushing on earth's magnetic field
+  Josephson junction - superconducting junction
+  Pyroelectricity - voltage from temp changes - upgrade from piezoelectricity
+  dark star - upgrade to WIMPs
 
 ******************************************************** CARS IMAGES ********************************************************
 
@@ -1232,28 +1132,32 @@ if pause is pressed while selecting power ups, display pause menu on top of sele
   laser
   supercritical fission
 ***past style themes***
-  field emitter - bipedal white robot spherical gun turret on bird legs
-      damaged dirty white robot spherical gun turret on bird legs in the style of Solarpunk
-  standing wave - concentric transparent blue geometric circles science  
+  base prompt for player on 5.2:  clean white robot spherical turret on bird legs test chamber
+  standing wave - a 3-D cyan transparent nested concentric aligned centered sphere with rings
+    by Philippe Starck 
   perfect diamagnetism - physics magnetic field chalk diagram 
   time dilation - graphic of a hyperbolic equation Luminogram
   negative mass - Blacklight painting by Moebius
   plasma torch - by Dan Mumford
+
   metamaterial cloaking - Scientific photography by Miki Asai,   by Bruce Munro
   molecular assembler - by Laurie Greasley 16-bit Isometric 
   wormhole - by Tim White
+  pilot wave - none
 
   nail gun - Screenprint
   shotgun - blueprint by Dan McPharlin
-  grenades, missiles, explosions - by Victo Ngai
-  spores - by Ernst Haeckel
-  drones - tilt-shift photography
+  grenades, missiles, explosions - vibrant fireball explosion sonic shockwave ring art by Victo Ngai --ar 3:2 --v 5 --s 750
+  spores - turquoise black spores on a white background full color scientific anatomy by Ernst Haeckel
+  drones - insect quadcopter tilt-shift photography
   super balls - By Akari Toriyama
   wave - sound wave oscilloscope by Paul Catherall,   concentric circles by Paul Catherall 
+    Barbara Takenaga's painting depicting a clean sound wave on aoscilloscope device --ar 3:2 --v 5
   foam - black blobs Ink doodle
-  harpoon - by Eiichiro Oda
+  harpoon - iron harpoon on a rope weapon art white background by Eiichiro Oda --no fish --ar 3:2 --v 5 --s 750
   mine - by Dan McPharlin
   laser - complex optical scientific equipment
+    knolling photography
 
   guns, ammo - isometric clean pixel art image cutaway of , style of tekkonkinkreet
   defensive - Paper cutout
@@ -1269,8 +1173,9 @@ if pause is pressed while selecting power ups, display pause menu on top of sele
   invulnerable - by Nick Veasey (photos that look like x-rays)
   alternate reality -  Fractal art 
   tech choice -  mandala tile Mosaic 
-  tech that spawns heal power ups -  green Quilling 
   time, CPT, pause -  by Lee Bontecou
   boost, coupling power ups tech - cyan electron orbiting a black nucleus electric field as bas-relief   //(by Kazumasa Nagai)
   radioactive - volumetric atomic nucleus diagram by Paul Catherall
+
+
 

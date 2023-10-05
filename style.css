@@ -9,6 +9,7 @@ body {
     margin: 0;
     overflow: hidden;
     cursor: auto;
+    /* transition: background-color 0.2s ease-in-out; */
 }
 
 canvas {
@@ -161,7 +162,7 @@ summary {
     height: 100%;
 }
 
-#choose-grid {
+.choose-grid {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -180,10 +181,39 @@ summary {
     transition: opacity 0.25s linear;
     overflow: auto;
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
 }
+
+
+
+
+.choose-grid-no-images {
+    border-radius: 8px;
+    border: 10px solid #444;
+    gap: 10px;
+    background-color: #444;
+    /* padding: 10px 1px; */
+
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0px;
+    z-index: 12;
+    max-height: 99vh;
+    font-size: 1.3em;
+    display: grid;
+    grid-template-columns: 384px;
+    align-items: stretch;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s linear;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 
 #choose-grid::-webkit-scrollbar {
     display: none;
@@ -193,6 +223,9 @@ summary {
     line-height: 160%;
     background-color: var(--card-color);
     font-size: 0.75em;
+    /* transform-style: preserve-3d;
+    transition: transform 2s;
+    transform: rotateX(180deg); */
 }
 
 .choose-grid-module:hover {
@@ -265,6 +298,27 @@ summary {
     font-size: 0.75em;
 }
 
+.sort {
+    padding: 0.1em 0.3em;
+    border: 1px solid #444;
+    /* min-height: 88px; */
+    line-height: 100%;
+    background-color: #fff;
+}
+
+.sort-button {
+    border: 1px #333 solid;
+    border-radius: 0.5em;
+    background-color: #fff;
+    font-size: 0.5em;
+    /* padding: 0.3em; */
+
+}
+
+.sort-button:hover {
+    background-color: #eee;
+}
+
 .pause-eject .card-text {
     animation: techColorCycle 1s linear infinite alternate;
 }
@@ -322,8 +376,8 @@ summary {
     top: 0;
     z-index: 10;
     align-self: start;
-    width: 195px;
-    line-height: 170%;
+    width: 276px;
+    line-height: 200%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -335,7 +389,7 @@ summary {
     /* border-bottom-left-radius: 0px; */
     border-top-right-radius: 0px;
     padding: 0.2em 0px;
-    height: 190px;
+    /* height: 210px; */
     box-shadow: 8px 8px 7px rgba(0, 0, 50, 0.15);
 }
 
@@ -356,6 +410,7 @@ summary {
     margin-right: -1px;
     font-size: 0.92em;
     min-height: 88px;
+    /* border-radius: 5px; */
 }
 
 .cancel-card {
@@ -390,19 +445,31 @@ summary {
     background-color: var(--hover-card-color);
 }
 
+.research-cancel {
+    display: flex;
+    gap: 10px;
+    line-height: 160%;
+    /* background-color: var(--card-color); */
+    font-size: 1em;
+}
 
 /* keeps 5 columns at 1440px */
 @media (min-width: 1710px) and (max-width: 1950px) {
 
     .experiment-grid-module,
     .choose-grid-module,
-    .pause-grid-module {
+    .pause-grid-module,
+    .research-cancel {
         line-height: 143%;
         font-size: 0.68em;
     }
 
+    .research-cancel {
+        font-size: 0.9em;
+    }
+
     #experiment-grid,
-    #choose-grid,
+    .choose-grid,
     .pause-grid {
         grid-template-columns: repeat(auto-fit, 340px);
     }
@@ -426,8 +493,12 @@ summary {
         font-size: 0.58em;
     }
 
+    .research-cancel {
+        font-size: 0.8em;
+    }
+
     #experiment-grid,
-    #choose-grid,
+    .choose-grid,
     .pause-grid {
         grid-template-columns: repeat(auto-fit, 285px);
     }
@@ -439,6 +510,13 @@ summary {
     .card-text {
         min-height: 64px;
     }
+}
+
+/* .card-text */
+.choose-grid-no-images .card-text,
+.choose-grid-no-images .research-card,
+.choose-grid-no-images .cancel-card {
+    border-radius: 5px;
 }
 
 /* keeps 4 columns at 1440px */
@@ -512,7 +590,7 @@ summary {
 }
 
 .experiment-grid-disabled[data-descr]:hover::after {
-    content: '\a \00a0 \00a0 \00a0 REQUIRES:\a \00a0 \00a0 \00a0 'attr(data-descr);
+    content: '\a \00a0 \00a0 \00a0 REQUIRES:\a \00a0 \00a0 \00a0 ' attr(data-descr);
     white-space: pre-wrap;
     position: absolute;
     left: 0;
@@ -564,7 +642,7 @@ summary {
     right: 4px;
     height: 0px;
     width: 7px;
-    transition: height 0.15s linear;
+    transition: height 0.25s linear;
     opacity: 1;
     z-index: 2;
     pointer-events: none;
@@ -580,7 +658,7 @@ summary {
     left: 15px;
     height: 7px;
     width: 0px;
-    transition: width 0.3s linear;
+    transition: width 0.25s linear;
     opacity: 1;
     z-index: 2;
     pointer-events: none;
@@ -588,18 +666,21 @@ summary {
     border-right: 1.5px solid #777;
     display: none;
 }
+
 #health {
     position: absolute;
     top: 15px;
     left: 15px;
     height: 20px;
     width: 0px;
-    transition: width 1s ease-out;    z-index: 2;
+    transition: width 1s ease-out;
+    z-index: 2;
     pointer-events: none;
     background-color: rgb(9, 245, 166);
     border-right: 2px solid rgb(51, 162, 125);
     display: none;
 }
+
 #health-bg {
     position: absolute;
     top: 15px;

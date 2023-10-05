@@ -1,7 +1,7 @@
 // game Object ********************************************************
 //*********************************************************************
 const simulation = {
-    loop() {}, //main game loop, gets set to normal or testing loop
+    loop() { }, //main game loop, gets set to normal or testing loop
     normalLoop() {
         simulation.gravity();
         Engine.update(engine, simulation.delta);
@@ -20,7 +20,6 @@ const simulation = {
         mobs.draw();
         simulation.draw.cons();
         simulation.draw.body();
-        simulation.checks();
         if (!m.isBodiesAsleep) mobs.loop();
         mobs.healthBar();
         m.draw();
@@ -33,6 +32,7 @@ const simulation = {
         b.bulletDraw();
         if (!m.isBodiesAsleep) b.bulletDo();
         simulation.drawCircle();
+        simulation.runEphemera();
         // simulation.clip();
         ctx.restore();
         simulation.drawCursor();
@@ -50,7 +50,6 @@ const simulation = {
         }
         m.move();
         m.look();
-        simulation.checks();
         simulation.camera();
         level.custom();
         m.draw();
@@ -68,6 +67,7 @@ const simulation = {
         simulation.draw.cons();
         simulation.draw.testing();
         simulation.drawCircle();
+        simulation.runEphemera();
         simulation.constructCycle()
         ctx.restore();
         simulation.testingOutput();
@@ -88,7 +88,6 @@ const simulation = {
             }
             m.move();
             level.custom();
-            simulation.checks();
             mobs.loop();
             m.walk_cycle += m.flipLegs * m.Vx;
             m.hold();
@@ -96,6 +95,7 @@ const simulation = {
             b.fire();
             b.bulletRemove();
             b.bulletDo();
+            simulation.runEphemera();
         }
         simulation.isTimeSkipping = false;
     },
@@ -108,13 +108,27 @@ const simulation = {
             Engine.update(engine, simulation.delta);
             // level.custom();
             // level.customTopLayer();
-            simulation.checks();
             if (!m.isBodiesAsleep) mobs.loop();
             if (m.fieldMode !== 7) m.hold();
             b.bulletRemove();
             if (!m.isBodiesAsleep) b.bulletDo();
+            simulation.runEphemera();
         }
         simulation.isTimeSkipping = false;
+    },
+    ephemera: [], //array that is used to store ephemera objects
+    removeEphemera: function (name) {
+        for (let i = 0, len = simulation.ephemera.length; i < len; i++) {
+            if (simulation.ephemera[i].name === name) {
+                simulation.ephemera.splice(i, 1);
+                break;
+            }
+        }
+    },
+    runEphemera() {
+        for (let i = 0; i < simulation.ephemera.length; i++) {
+            simulation.ephemera[i].do();
+        }
     },
     // timeMobSkip() {
     //     simulation.gravity();
@@ -135,7 +149,6 @@ const simulation = {
     //     simulation.draw.cons();
     //     simulation.draw.body();
     //     if (!m.isBodiesAsleep) {
-    //         simulation.checks();
     //         // mobs.loop();
     //     }
     //     mobs.healthBar();
@@ -385,23 +398,9 @@ const simulation = {
                 }
             }
         }
-
-        // if (b.inventory.length > 0) {
-        //     for (let i = 0, len = b.inventory.length; i < len; ++i) document.getElementById(b.inventory[i]).style.opacity = "0.3";
-        //     // document.getElementById(b.activeGun).style.fontSize = "30px";
-        //     if (document.getElementById(b.activeGun)) document.getElementById(b.activeGun).style.opacity = "1";
-        // }
     },
     updateGunHUD() {
-        // for (let i = 0, len = b.inventory.length; i < len; ++i) {
-        //     if (flashIndex === i) {
-        //         document.getElementById(b.inventory[i]).innerHTML = b.guns[b.inventory[i]].name + " - " + b.guns[b.inventory[i]].ammo;
-        //     } else {
-        //         document.getElementById(b.inventory[i]).innerHTML = b.guns[b.inventory[i]].name + " - " + b.guns[b.inventory[i]].ammo;
-        //     }
-        // }
         for (let i = 0, len = b.inventory.length; i < len; ++i) {
-            // document.getElementById(b.inventory[i]).innerHTML = b.guns[b.inventory[i]].name + " - " + b.guns[b.inventory[i]].ammo;
             document.getElementById(b.inventory[i]).innerHTML = `${b.guns[b.inventory[i]].name} - ${b.guns[b.inventory[i]].ammo}`
         }
     },
@@ -446,7 +445,7 @@ const simulation = {
     // SVGleftMouse: '<svg viewBox="750 0 200 765" class="mouse-icon" width="40px" height = "60px" stroke-linecap="round" stroke-linejoin="round" stroke-width="25px" stroke="#000" fill="none">  <path fill="#fff" stroke="none" d="M827,112 h30 a140,140,0,0,1,140,140 v268 a140,140,0,0,1-140,140 h-60 a140,140,0,0,1-140-140v-268 a140,140,0,0,1,140-140h60" />  <path d="M832.41,106.64 V323.55 H651.57 V256.64 c0-82.5,67.5-150,150-150 Z" fill="#149" stroke="none" />  <path fill="none" d="M827,112 h30 a140,140,0,0,1,140,140 v268 a140,140,0,0,1-140,140 h-60 a140,140,0,0,1-140-140v-268 a140,140,0,0,1,140-140h60" />  <path d="M657 317 h 340 h-170 v-207" />  <ellipse fill="#fff" cx="827.57" cy="218.64" rx="29" ry="68" />  </svg>',
     // SVGrightMouse: '<svg viewBox="750 0 200 765" class="mouse-icon" width="40px" height = "60px" stroke-linecap="round" stroke-linejoin="round" stroke-width="25px" stroke="#000" fill="none">  <path fill="#fff" stroke="none" d="M827,112 h30 a140,140,0,0,1,140,140 v268 a140,140,0,0,1-140,140 h-60 a140,140,0,0,1-140-140v-268 a140,140,0,0,1,140-140h60" />  <path d="M827,112 h30 a140,140,0,0,1,140,140 v68 h-167 z" fill="#0cf" stroke="none" />  <path fill="none" d="M827,112 h30 a140,140,0,0,1,140,140 v268 a140,140,0,0,1-140,140 h-60 a140,140,0,0,1-140-140v-268 a140,140,0,0,1,140-140h60" />  <path d="M657 317 h 340 h-170 v-207" />  <ellipse fill="#fff" cx="827.57" cy="218.64" rx="29" ry="68" />  </svg>',
     makeTextLog(text, time = 240) {
-        if (simulation.isTextLogOpen && !build.isExperimentSelection) {
+        if (!localSettings.isHideHUD && simulation.isTextLogOpen && !build.isExperimentSelection) {
             if (simulation.lastLogTime > m.cycle) { //if there is an older message
                 document.getElementById("text-log").innerHTML = document.getElementById("text-log").innerHTML + '<br>' + text;
                 simulation.lastLogTime = m.cycle + time;
@@ -591,16 +590,16 @@ const simulation = {
         const swapPeriod = 150
         const len = 30
         for (let i = 0; i < len; i++) {
-            setTimeout(function() {
-                simulation.wipe = function() { //set wipe to have trails
-                    ctx.fillStyle = `rgba(221,221,221,${i*i*0.0005 +0.0025})`;
+            setTimeout(function () {
+                simulation.wipe = function () { //set wipe to have trails
+                    ctx.fillStyle = `rgba(221,221,221,${i * i * 0.0005 + 0.0025})`;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
             }, (i) * swapPeriod);
         }
 
-        setTimeout(function() {
-            simulation.wipe = function() { //set wipe to normal
+        setTimeout(function () {
+            simulation.wipe = function () { //set wipe to normal
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
         }, len * swapPeriod);
@@ -637,7 +636,7 @@ const simulation = {
     // }
     // requestAnimationFrame(loop);
     // },
-    wipe() {}, //set in simulation.startGame
+    wipe() { }, //set in simulation.startGame
     gravity() {
         function addGravity(bodies, magnitude) {
             for (var i = 0; i < bodies.length; i++) {
@@ -661,7 +660,7 @@ const simulation = {
 
         simulation.clearTimeouts();
         simulation.onTitlePage = true;
-        document.getElementById("splash").onclick = function() {
+        document.getElementById("splash").onclick = function () {
             simulation.startGame();
         };
         document.getElementById("choose-grid").style.visibility = "hidden"
@@ -717,12 +716,18 @@ const simulation = {
         document.getElementById("dmg").style.display = "inline";
         document.getElementById("health").style.display = "inline"
         document.getElementById("health-bg").style.display = "inline";
-        document.getElementById("defense-bar").style.display = "inline"
-        document.getElementById("damage-bar").style.display = "inline"
-
-        document.getElementById("tech").style.display = "inline"
+        if (!localSettings.isHideHUD) {
+            document.getElementById("tech").style.display = "inline"
+            document.getElementById("defense-bar").style.display = "inline"
+            document.getElementById("damage-bar").style.display = "inline"
+        } else {
+            document.getElementById("tech").style.display = "none"
+            document.getElementById("defense-bar").style.display = "none"
+            document.getElementById("damage-bar").style.display = "none"
+        }
         document.getElementById("guns").style.display = "inline"
         document.getElementById("field").style.display = "inline"
+
         // document.body.style.overflow = "hidden"
         document.getElementById("pause-grid-left").style.display = "none"
         document.getElementById("pause-grid-right").style.display = "none"
@@ -745,9 +750,10 @@ const simulation = {
         level.populateLevels()
 
         input.endKeySensing();
-        b.removeAllGuns();
+        simulation.ephemera = []
         tech.setupAllTech(); //sets tech to default values
-        tech.cancelCount = 0;
+        b.removeAllGuns();
+        tech.duplication = 0;
         for (i = 0, len = b.guns.length; i < len; i++) { //find which gun 
             if (b.guns[i].name === "laser") b.guns[i].chooseFireMethod()
             if (b.guns[i].name === "nail gun") b.guns[i].chooseFireMethod()
@@ -760,6 +766,7 @@ const simulation = {
         tech.laserBotCount = 0;
         tech.orbitBotCount = 0;
         tech.foamBotCount = 0;
+        tech.soundBotCount = 0;
         tech.boomBotCount = 0;
         tech.plasmaBotCount = 0;
         tech.missileBotCount = 0;
@@ -784,7 +791,7 @@ const simulation = {
         // m.maxEnergy = 1
         // m.energy = 1
         input.isPauseKeyReady = true
-        simulation.wipe = function() { //set wipe to normal
+        simulation.wipe = function () { //set wipe to normal
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
         m.hole.isOn = false
@@ -859,19 +866,156 @@ const simulation = {
         build.isExperimentSelection = false;
         build.isExperimentRun = false;
 
+
+        //setup checks
+        if (!localSettings.isHideHUD) {
+            simulation.ephemera.push({
+                name: "dmgDefBars", count: 0, do() {
+                    if (!(m.cycle % 15)) { //4 times a second
+                        const defense = m.defense()             //update defense bar
+                        if (m.lastCalculatedDefense !== defense) {
+                            document.getElementById("defense-bar").style.width = Math.floor(300 * m.maxHealth * (1 - defense)) + "px";
+                            m.lastCalculatedDefense = defense
+                        }
+                        const damage = tech.damageFromTech()             //update damage bar
+                        if (m.lastCalculatedDamage !== damage) {
+                            document.getElementById("damage-bar").style.height = Math.floor((Math.atan(0.25 * damage - 0.25) + 0.25) * 0.53 * canvas.height) + "px";
+                            m.lastCalculatedDamage = damage
+                        }
+                    }
+                },
+            })
+        }
+        simulation.ephemera.push({
+            name: "uniqueName", count: 0, do() {
+                if (!(m.cycle % 60)) { //once a second
+                    //energy overfill 
+                    if (m.energy > m.maxEnergy) {
+                        m.energy = m.maxEnergy + (m.energy - m.maxEnergy) * tech.overfillDrain //every second energy above max energy loses 25%
+                        if (m.energy > 1000000) m.energy = 1000000
+                    }
+                    if (tech.isFlipFlopEnergy && m.immuneCycle < m.cycle) {
+                        if (tech.isFlipFlopOn) {
+                            if (m.immuneCycle < m.cycle) m.energy += 0.2;
+                        } else {
+                            m.energy -= 0.01;
+                            if (m.energy < 0) m.energy = 0
+                        }
+                    }
+                    if (tech.relayIce && tech.isFlipFlopOn) {
+                        for (let j = 0; j < tech.relayIce; j++) {
+                            for (let i = 0, len = 3 + Math.ceil(9 * Math.random()); i < len; i++) b.iceIX(2)
+                        }
+                    }
+
+                    if (m.pos.y > simulation.fallHeight) { // if 4000px deep
+                        Matter.Body.setVelocity(player, {
+                            x: 0,
+                            y: 0
+                        });
+                        Matter.Body.setPosition(player, {
+                            x: level.enter.x + 50,
+                            y: level.enter.y - 20
+                        });
+                        // move bots
+                        for (let i = 0; i < bullet.length; i++) {
+                            if (bullet[i].botType) {
+                                Matter.Body.setPosition(bullet[i], Vector.add(player.position, {
+                                    x: 250 * (Math.random() - 0.5),
+                                    y: 250 * (Math.random() - 0.5)
+                                }));
+                                Matter.Body.setVelocity(bullet[i], {
+                                    x: 0,
+                                    y: 0
+                                });
+                            }
+                        }
+                        m.damage(0.1 * simulation.difficultyMode);
+                        m.energy -= 0.1 * simulation.difficultyMode
+                    }
+                    if (isNaN(player.position.x)) m.death();
+                    if (m.lastKillCycle + 300 > m.cycle) { //effects active for 5 seconds after killing a mob
+                        if (tech.isEnergyRecovery && m.immuneCycle < m.cycle) {
+                            m.energy += m.maxEnergy * 0.05
+                            simulation.drawList.push({ //add dmg to draw queue
+                                x: m.pos.x,
+                                y: m.pos.y - 45,
+                                radius: Math.sqrt(m.maxEnergy * 0.05) * 60,
+                                color: "rgba(0, 204, 255,0.4)", //#0cf
+                                time: 4
+                            });
+                        }
+                        if (tech.isHealthRecovery) {
+                            const heal = 0.005 * m.maxHealth
+                            m.addHealth(heal)
+                            simulation.drawList.push({ //add dmg to draw queue
+                                x: m.pos.x,
+                                y: m.pos.y,
+                                radius: Math.sqrt(heal) * 150,
+                                color: "rgba(0,255,200,0.5)",
+                                time: 4
+                            });
+                        }
+                    }
+
+                    if (!(m.cycle % 420)) { //once every 7 seconds
+                        if (tech.isZeno) {
+                            if (tech.isEnergyHealth) {
+                                m.energy *= 0.95
+                            } else {
+                                m.health *= 0.95 //remove 5%
+                                m.displayHealth();
+                            }
+
+                        }
+                        if (tech.cyclicImmunity && m.immuneCycle < m.cycle + tech.cyclicImmunity) m.immuneCycle = m.cycle + tech.cyclicImmunity; //player is immune to damage for 60 cycles
+
+                        fallCheck = function (who, save = false) {
+                            let i = who.length;
+                            while (i--) {
+                                if (who[i].position.y > simulation.fallHeight) {
+                                    if (save) {
+                                        Matter.Body.setVelocity(who[i], {
+                                            x: 0,
+                                            y: 0
+                                        });
+                                        Matter.Body.setPosition(who[i], {
+                                            x: level.exit.x + 30 * (Math.random() - 0.5),
+                                            y: level.exit.y + 30 * (Math.random() - 0.5)
+                                        });
+                                    } else {
+                                        Matter.Composite.remove(engine.world, who[i]);
+                                        who.splice(i, 1);
+                                    }
+                                }
+                            }
+                        };
+                        fallCheck(body);
+                        fallCheck(powerUp, true);
+                        let i = mob.length;
+                        while (i--) {
+                            if (mob[i].position.y > simulation.fallHeight) mob[i].death();
+                        }
+
+                    }
+                }
+            },
+        })
+
         //setup FPS cap
         simulation.fpsInterval = 1000 / simulation.fpsCap;
         simulation.then = Date.now();
         requestAnimationFrame(cycle); //starts game loop
     },
     clearTimeouts() {
-        let id = window.setTimeout(function() {}, 0);
+        let id = window.setTimeout(function () { }, 0);
         while (id--) {
             window.clearTimeout(id); // will do nothing if no timeout with id is present
         }
     },
     clearNow: false,
     clearMap() {
+        level.isProcedural = false;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         if (m.alive) {
             if (tech.isLongitudinal) b.guns[3].waves = []; //empty array of wave bullets
@@ -938,11 +1082,29 @@ const simulation = {
             map: "#444",
             bullet: "#000"
         }
+        simulation.draw.drawMapPath = simulation.draw.drawMapPathDefault
         m.fireCDcycle = 0
         m.drop();
         m.hole.isOn = false;
         simulation.drawList = [];
 
+        if (tech.isHealAttract && m.alive) { //send health power ups to the next level
+            let healCount = 0
+            for (let i = 0, len = powerUp.length; i < len; i++) {
+                if (powerUp[i].name === "heal" && Vector.magnitudeSquared(Vector.sub(powerUp[i].position, m.pos)) < 1000000) healCount++
+            }
+            //respawn health in animation frame
+            let respawnHeal = () => {
+                if (healCount > 0) {
+                    requestAnimationFrame(respawnHeal);
+                    if (!simulation.paused && !simulation.isChoosing) {
+                        healCount--
+                        powerUps.directSpawn(level.enter.x + 50 + 100 * (Math.random() - 0.5), level.enter.y - 60 + 100 * (Math.random() - 0.5), "heal");
+                    }
+                }
+            }
+            requestAnimationFrame(respawnHeal);
+        }
         if (tech.isDronesTravel && m.alive) {
             //count drones
             let droneCount = 0
@@ -964,39 +1126,7 @@ const simulation = {
             }
 
             //respawn drones in animation frame
-            let respawnDrones = () => {
-                if (droneCount > 0) {
-                    requestAnimationFrame(respawnDrones);
-                    if (!simulation.paused && !simulation.isChoosing && m.alive) {
-                        const where = {
-                            x: level.enter.x + 50,
-                            y: level.enter.y - 60
-                        }
-                        droneCount--
-                        if (tech.isDroneRadioactive) {
-                            b.droneRadioactive({
-                                x: where.x + 100 * (Math.random() - 0.5),
-                                y: where.y + 100 * (Math.random() - 0.5)
-                            }, 0)
-                        } else {
-                            b.drone({
-                                x: where.x + 100 * (Math.random() - 0.5),
-                                y: where.y + 120 * (Math.random() - 0.5)
-                            }, 0)
-                            if (tech.isDroneGrab && deliveryCount > 0) {
-                                const who = bullet[bullet.length - 1]
-                                who.isImproved = true;
-                                const SCALE = 2.25
-                                Matter.Body.scale(who, SCALE, SCALE);
-                                who.lookFrequency = 30 + Math.floor(11 * Math.random());
-                                who.endCycle += 3000 * tech.droneCycleReduction * tech.isBulletsLastLonger
-                                deliveryCount--
-                            }
-                        }
-                    }
-                }
-            }
-            requestAnimationFrame(respawnDrones);
+            requestAnimationFrame(() => { b.delayDrones({ x: level.enter.x + 50, y: level.enter.y - 60 }, droneCount) });
 
             //respawn spores in animation frame
             let respawnSpores = () => {
@@ -1060,11 +1190,17 @@ const simulation = {
             }
             requestAnimationFrame(respawnFleas);
         }
-
         if (tech.isQuantumEraser) {
+            let count = 0
             for (let i = 0, len = mob.length; i < len; i++) {
-                if (mob[i].isDropPowerUp && mob[i].alive) tech.quantumEraserCount++
+                if (mob[i].isDropPowerUp && mob[i].alive) count++
             }
+            count *= 0.17 //to fake the chance, this makes it not random, and maybe less confusing
+            let cycle = () => { //run after waiting a cycle for the map to be cleared
+                const types = ["heal", "ammo", "heal", "ammo", "research", "coupling", "boost", "tech", "gun", "field"]
+                for (let i = 0; i < count; i++) powerUps.spawnDelay(types[Math.floor(Math.random() * types.length)], 1)
+            }
+            requestAnimationFrame(cycle);
         }
 
         function removeAll(array) {
@@ -1101,6 +1237,8 @@ const simulation = {
             m.holdingTarget.collisionFilter.category = 0;
             m.holdingTarget.collisionFilter.mask = 0;
             m.definePlayerMass(m.defaultMass + m.holdingTarget.mass * m.holdingMassScale)
+            Composite.add(engine.world, m.holdingTarget); //add to world
+            m.holdingTarget.classType = "body"
         }
         //set fps back to default
         simulation.fpsCap = simulation.fpsCapDefault
@@ -1135,127 +1273,222 @@ const simulation = {
     //     }
     //   }
     // },
-    checks() {
-        if (!(m.cycle % 15)) { //4 times a second
-            //update defense bar
-            const defense = m.defense()
-            if (m.lastCalculatedDefense !== defense) {
-                document.getElementById("defense-bar").style.width = Math.floor(300 * m.maxHealth * (1 - defense)) + "px";
-
-                // if (m.lastCalculatedDefense === 1) document.getElementById("defense-bar").style.display = "inline"
-                // if (defense === 1) document.getElementById("defense-bar").style.display = "none"
-                // Math.pow(m.defense(), 0.13)
-                m.lastCalculatedDefense = defense
-                // console.log(defense)
-            }
-
-            //update damage bar
-            const damage = tech.damageFromTech()
-            if (m.lastCalculatedDamage !== damage) {
-                canvas.width
-                // document.getElementById("damage-bar").style.width = Math.floor(Math.atan(damage - 1) / 6.28 * canvas.width) + "px";
-                document.getElementById("damage-bar").style.height = Math.floor(Math.atan(damage - 1) / 3.14 * canvas.height) + "px";
-
-                m.lastCalculatedDamage = damage
-                console.log(damage)
-            }
-
-
-
-        }
-        if (!(m.cycle % 60)) { //once a second
-            //energy overfill 
-            if (m.energy > m.maxEnergy) {
-                m.energy = m.maxEnergy + (m.energy - m.maxEnergy) * tech.overfillDrain //every second energy above max energy loses 25%
-                if (m.energy > 1000000) m.energy = 1000000
-            }
-            if (tech.isFlipFlopEnergy && m.immuneCycle < m.cycle) {
-                if (tech.isFlipFlopOn) {
-                    if (m.immuneCycle < m.cycle) m.energy += 0.2;
-                } else {
-                    m.energy -= 0.01;
-                    if (m.energy < 0) m.energy = 0
-                }
-            }
-            if (tech.relayIce && tech.isFlipFlopOn) {
-                for (let j = 0; j < tech.relayIce; j++) {
-                    for (let i = 0, len = 3 + Math.ceil(9 * Math.random()); i < len; i++) b.iceIX(2)
-                }
-            }
-
-            if (m.pos.y > simulation.fallHeight) { // if 4000px deep
-                Matter.Body.setVelocity(player, {
-                    x: 0,
-                    y: 0
-                });
-                Matter.Body.setPosition(player, {
-                    x: level.enter.x + 50,
-                    y: level.enter.y - 20
-                });
-                // move bots
-                for (let i = 0; i < bullet.length; i++) {
-                    if (bullet[i].botType) {
-                        Matter.Body.setPosition(bullet[i], Vector.add(player.position, {
-                            x: 250 * (Math.random() - 0.5),
-                            y: 250 * (Math.random() - 0.5)
-                        }));
-                        Matter.Body.setVelocity(bullet[i], {
-                            x: 0,
-                            y: 0
-                        });
-                    }
-                }
-                m.damage(0.1 * simulation.difficultyMode);
-                m.energy -= 0.1 * simulation.difficultyMode
-            }
-            if (isNaN(player.position.x)) m.death();
-            if (m.lastKillCycle + 300 > m.cycle) { //effects active for 5 seconds after killing a mob
-                if (tech.isEnergyRecovery && m.immuneCycle < m.cycle) m.energy += m.maxEnergy * 0.05
-                if (tech.isHealthRecovery) m.addHealth(0.005 * m.maxHealth)
-            }
-
-            if (!(m.cycle % 420)) { //once every 7 seconds
-                if (tech.isZeno) {
-                    if (tech.isEnergyHealth) {
-                        m.energy *= 0.95
-                    } else {
-                        m.health *= 0.95 //remove 5%
-                        m.displayHealth();
-                    }
-
-                }
-                if (tech.cyclicImmunity && m.immuneCycle < m.cycle + tech.cyclicImmunity) m.immuneCycle = m.cycle + tech.cyclicImmunity; //player is immune to damage for 60 cycles
-
-                fallCheck = function(who, save = false) {
-                    let i = who.length;
-                    while (i--) {
-                        if (who[i].position.y > simulation.fallHeight) {
-                            if (save) {
-                                Matter.Body.setVelocity(who[i], {
-                                    x: 0,
-                                    y: 0
-                                });
-                                Matter.Body.setPosition(who[i], {
-                                    x: level.exit.x + 30 * (Math.random() - 0.5),
-                                    y: level.exit.y + 30 * (Math.random() - 0.5)
-                                });
-                            } else {
-                                Matter.Composite.remove(engine.world, who[i]);
-                                who.splice(i, 1);
-                            }
-                        }
-                    }
-                };
-                fallCheck(mob);
-                fallCheck(body);
-                fallCheck(powerUp, true);
-            }
-        }
-    },
     testingOutput() {
         ctx.fillStyle = "#000";
         ctx.textAlign = "center";
         ctx.fillText(`(${simulation.mouseInGame.x.toFixed(1)}, ${simulation.mouseInGame.y.toFixed(1)})`, simulation.mouse.x, simulation.mouse.y - 20);
+    },
+    sight: { //credit to Cornbread for adding this algorithm to n-gon
+        // square: 0,
+        intersectMap: [], //this is precalculated in simulation.draw.lineOfSightPrecalculation()
+        getIntersection(v1, v1End, domain) {
+            const intersections = simulation.sight.getIntersections(v1, v1End, domain);
+            var best = { x: v1End.x, y: v1End.y, dist: (v1End.x - v1.x) ** 2 + (v1End.y - v1.y) ** 2 }
+            for (const intersection of intersections) {
+                const dist = (intersection.x - v1.x) ** 2 + (intersection.y - v1.y) ** 2;
+                if (dist < best.dist) best = { x: intersection.x, y: intersection.y, dist: dist }
+            }
+            best.dist = Math.sqrt(best.dist)
+            return best;
+        },
+        getIntersections(v1, v1End, domain) {
+            const intersections = [];
+            for (const obj of domain) {
+                for (var i = 0; i < obj.vertices.length - 1; i++) {
+                    results = simulation.checkLineIntersection(v1, v1End, obj.vertices[i], obj.vertices[i + 1]);
+                    if (results.onLine1 && results.onLine2) intersections.push({ x: results.x, y: results.y });
+                }
+                results = simulation.checkLineIntersection(v1, v1End, obj.vertices[obj.vertices.length - 1], obj.vertices[0]);
+                if (results.onLine1 && results.onLine2) intersections.push({ x: results.x, y: results.y });
+            }
+            return intersections;
+        },
+        circleLoS(pos, radius) {
+            function allCircleLineCollisions(c, radius, domain) {
+                var lines = [];
+                for (const obj of domain) {
+                    for (var i = 0; i < obj.vertices.length - 1; i++) lines.push(circleLineCollisions(obj.vertices[i], obj.vertices[i + 1], c, radius));
+                    lines.push(circleLineCollisions(obj.vertices[obj.vertices.length - 1], obj.vertices[0], c, radius));
+                }
+                const collisionLines = [];
+                for (const line of lines) {
+                    if (line.length == 2) {
+                        // const distance1 = Math.sqrt((line[0].x - c.x) ** 2 + (line[0].y - c.y) ** 2)
+                        // const angle1 = Math.atan2(line[0].y - c.y, line[0].x - c.x);
+                        // const queryPoint1 = {
+                        //     x: Math.cos(angle1) * (distance1 - 1) + c.x,
+                        //     y: Math.sin(angle1) * (distance1 - 1) + c.y
+                        // }
+                        // const distance2 = Math.sqrt((line[1].x - c.x) ** 2 + (line[1].y - c.y) ** 2)
+                        // const angle2 = Math.atan2(line[1].y - c.y, line[1].x - c.x);
+                        // const queryPoint2 = {
+                        //     x: Math.cos(angle2) * (distance2 - 1) + c.x,
+                        //     y: Math.sin(angle2) * (distance2 - 1) + c.y
+                        // }
+                        collisionLines.push(line)
+                    }
+                }
+
+                return collisionLines;
+            }
+
+            function circleLineCollisions(a, b, c, radius) {
+                // calculate distances
+                const angleOffset = Math.atan2(b.y - a.y, b.x - a.x);
+                const sideB = Math.sqrt((a.x - c.x) ** 2 + (a.y - c.y) ** 2);
+                const sideC = Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
+                const sideA = Math.sqrt((c.x - b.x) ** 2 + (c.y - b.y) ** 2);
+
+                // calculate the closest point on line AB to point C
+                const angleA = Math.acos((sideB ** 2 + sideC ** 2 - sideA ** 2) / (2 * sideB * sideC)) * (a.x - c.x) / -Math.abs(a.x - c.x)
+                const sideAD = Math.cos(angleA) * sideB;
+                const d = { // closest point
+                    x: Math.cos(angleOffset) * sideAD + a.x,
+                    y: Math.sin(angleOffset) * sideAD + a.y
+                }
+                const distance = Math.sqrt((d.x - c.x) ** 2 + (d.y - c.y) ** 2);
+                if (distance == radius) {
+                    // tangent
+                    return [d];
+                } else if (distance < radius) {
+                    // secant
+                    const angleOffset = Math.atan2(d.y - c.y, d.x - c.x);
+                    const innerAngle = Math.acos(distance / radius);
+                    const intersection1 = {
+                        x: Math.cos(angleOffset + innerAngle) * radius + c.x,
+                        y: Math.sin(angleOffset + innerAngle) * radius + c.y
+                    }
+
+                    const intersection2 = {
+                        x: Math.cos(angleOffset - innerAngle) * radius + c.x,
+                        y: Math.sin(angleOffset - innerAngle) * radius + c.y
+                    }
+
+                    const distance1 = {
+                        a: Math.sqrt((intersection1.x - a.x) ** 2 + (intersection1.y - a.y) ** 2),
+                        b: Math.sqrt((intersection1.x - b.x) ** 2 + (intersection1.y - b.y) ** 2)
+                    }
+                    const distance2 = {
+                        a: Math.sqrt((intersection2.x - a.x) ** 2 + (intersection2.y - a.y) ** 2),
+                        b: Math.sqrt((intersection2.x - b.x) ** 2 + (intersection2.y - b.y) ** 2)
+                    }
+                    const result = [];
+                    if (Math.abs(sideC - (distance1.a + distance1.b)) < 0.01) {
+                        result.push(intersection1);
+                    } else {
+                        if (distance1.a < distance1.b) {
+                            if (sideB <= radius) result.push(a);
+                        } else {
+                            if (sideA <= radius) result.push(b)
+                        }
+                    }
+                    if (Math.abs(sideC - (distance2.a + distance2.b)) < 0.01) {
+                        result.push(intersection2);
+                    } else {
+                        if (distance2.a <= distance2.b) {
+                            if (sideB <= radius) result.push(a);
+                        } else {
+                            if (sideA <= radius) result.push(b)
+                        }
+                    }
+
+                    return result;
+                } else {
+                    // no intersection
+                    return [];
+                }
+            }
+
+            var vertices = [];
+            for (const obj of simulation.sight.intersectMap) {
+                for (var i = 0; i < obj.vertices.length; i++) {
+                    const vertex = obj.vertices[i];
+                    const angleToVertex = Math.atan2(vertex.y - pos.y, vertex.x - pos.x);
+                    // const distanceToVertex = Math.sqrt((vertex.x - pos.x) ** 2 + (vertex.y - pos.y) ** 2);
+                    // const queryPoint = { x: Math.cos(angleToVertex) * (distanceToVertex - 1) + pos.x, y: Math.sin(angleToVertex) * (distanceToVertex - 1) + pos.y }
+                    const queryPoint = { x: Math.cos(angleToVertex + Math.PI) + vertex.x, y: Math.sin(angleToVertex + Math.PI) + vertex.y }
+
+                    if (Matter.Query.ray(map, pos, queryPoint).length == 0) {
+                        var distance = Math.sqrt((vertex.x - pos.x) ** 2 + (vertex.y - pos.y) ** 2);
+                        var endPoint = { x: vertex.x, y: vertex.y }
+
+                        if (distance > radius) {
+                            const angle = Math.atan2(vertex.y - pos.y, vertex.x - pos.x);
+                            endPoint = { x: Math.cos(angle) * radius + pos.x, y: Math.sin(angle) * radius + pos.y }
+                            distance = radius
+                        }
+
+                        var best = simulation.sight.getIntersection(pos, endPoint, map);
+                        if (best.dist >= distance) best = { x: endPoint.x, y: endPoint.y, dist: distance }
+                        vertices.push(best)
+
+                        var angle = Math.atan2(vertex.y - pos.y, vertex.x - pos.x);
+                        endPoint = { x: Math.cos(angle + 0.001) * radius + pos.x, y: Math.sin(angle + 0.001) * radius + pos.y }
+                        best = simulation.sight.getIntersection(pos, endPoint, map);
+
+                        if (best.dist >= radius) best = { x: endPoint.x, y: endPoint.y, dist: radius }
+                        vertices.push(best)
+
+                        angle = Math.atan2(vertex.y - pos.y, vertex.x - pos.x);
+                        endPoint = { x: Math.cos(angle - 0.001) * radius + pos.x, y: Math.sin(angle - 0.001) * radius + pos.y }
+
+                        best = simulation.sight.getIntersection(pos, endPoint, map);
+                        if (best.dist >= radius) best = { x: endPoint.x, y: endPoint.y, dist: radius }
+                        vertices.push(best)
+                    }
+                }
+            }
+
+            const outerCollisions = allCircleLineCollisions(pos, radius, map);
+            const circleCollisions = [];
+            for (const line of outerCollisions) {
+                for (const vertex of line) {
+                    // console.log('hi')
+                    const distance = Math.sqrt((vertex.x - pos.x) ** 2 + (vertex.y - pos.y) ** 2)
+                    const angle = Math.atan2(vertex.y - pos.y, vertex.x - pos.x);
+                    // const queryPoint = {
+                    //     x: Math.cos(angle) * (distance - 1) + pos.x,
+                    //     y: Math.sin(angle) * (distance - 1) + pos.y
+                    // }
+                    const queryPoint = { x: Math.cos(angle + Math.PI) + vertex.x, y: Math.sin(angle + Math.PI) + vertex.y }
+
+                    if (Math.abs(distance - radius) < 1 && Matter.Query.ray(map, pos, queryPoint).length == 0) circleCollisions.push(vertex)
+                }
+            }
+            for (var i = 0; i < circleCollisions.length; i++) {
+                const vertex = circleCollisions[i];
+                var nextIndex = i + 1;
+                if (nextIndex == circleCollisions.length) nextIndex = 0;
+                const nextVertex = circleCollisions[nextIndex];
+                const angle1 = Math.atan2(vertex.y - pos.y, vertex.x - pos.x);
+                const angle2 = Math.atan2(nextVertex.y - pos.y, nextVertex.x - pos.x);
+                var newAngle;
+                if (Math.abs(angle1) > Math.PI / 2 && Math.abs(angle2) > Math.PI / 2 && angle1 / Math.abs(angle1) != angle2 / Math.abs(angle2)) {
+                    // if the arc between the to points crosses over the left side (+/- pi radians)
+                    const newAngle1 = (Math.PI - Math.abs(angle1)) * (angle1 / Math.abs(angle1));
+                    const newAngle2 = (Math.PI - Math.abs(angle2)) * (angle2 / Math.abs(angle2));
+                    newAngle = (newAngle1 + newAngle2) / 2;
+                    var multiplier;
+                    if (newAngle == 0) {
+                        multiplier = 1;
+                    } else {
+                        multiplier = newAngle / Math.abs(newAngle);
+                    }
+                    newAngle = Math.PI * multiplier - newAngle * multiplier;
+                    test = true;
+                } else {
+                    newAngle = (angle1 + angle2) / 2;
+                }
+
+                // shoot ray between them
+                var endPoint = { x: Math.cos(newAngle) * radius + pos.x, y: Math.sin(newAngle) * radius + pos.y }
+                var best = simulation.sight.getIntersection(pos, endPoint, map);
+                vertices.push(vertex);
+                if (best.dist <= radius) vertices.push({ x: best.x, y: best.y })
+            }
+            vertices.sort((a, b) => Math.atan2(a.y - pos.y, a.x - pos.x) - Math.atan2(b.y - pos.y, b.x - pos.x));
+            return vertices;
+        },
     },
     draw: {
         // powerUp() { //is set by Bayesian tech
@@ -1339,9 +1572,82 @@ const simulation = {
                 simulation.draw.mapPath.lineTo(vertices[0].x, vertices[0].y);
             }
         },
-        drawMapPath() {
+        lineOfSightPrecalculation() {
+            simulation.sight.intersectMap = [];
+            for (var i = 0; i < map.length; i++) {
+                const obj = map[i];
+                const newVertices = [];
+                const restOfMap = [...map].slice(0, i).concat([...map].slice(i + 1))
+                for (var j = 0; j < obj.vertices.length - 1; j++) {
+                    var intersections = simulation.sight.getIntersections(obj.vertices[j], obj.vertices[j + 1], restOfMap);
+                    newVertices.push(obj.vertices[j]);
+                    for (const vertex of intersections) newVertices.push({ x: vertex.x, y: vertex.y });
+                }
+                intersections = simulation.sight.getIntersections(obj.vertices[obj.vertices.length - 1], obj.vertices[0], restOfMap);
+                newVertices.push(obj.vertices[obj.vertices.length - 1]);
+                for (const vertex of intersections) newVertices.push({ x: vertex.x, y: vertex.y });
+                //draw the vertices as black circles for debugging
+                // for (const vertex of newVertices) {
+                //     ctx.beginPath();
+                //     ctx.moveTo(vertex.x, vertex.y);
+                //     ctx.arc(vertex.x, vertex.y, 10, 0, 2 * Math.PI);
+                //     ctx.fillStyle = '#000';
+                //     ctx.fill()
+                // }
+                simulation.sight.intersectMap.push({ vertices: newVertices });
+            }
+        },
+        drawMapPath() { },
+        drawMapPathDefault() {
             ctx.fillStyle = color.map;
             ctx.fill(simulation.draw.mapPath);
+        },
+        drawMapSight() {
+            if (!simulation.isTimeSkipping) {
+                const pos = m.pos
+                const radius = 4000
+                const vertices = simulation.sight.circleLoS(pos, radius);
+                if (vertices.length) {
+                    ctx.beginPath();
+                    ctx.moveTo(vertices[0].x, vertices[0].y);
+                    for (var i = 1; i < vertices.length; i++) {
+                        var currentDistance = Math.sqrt((vertices[i - 1].x - pos.x) ** 2 + (vertices[i - 1].y - pos.y) ** 2);
+                        var newDistance = Math.sqrt((vertices[i].x - pos.x) ** 2 + (vertices[i].y - pos.y) ** 2);
+                        if (Math.abs(currentDistance - radius) < 1 && Math.abs(newDistance - radius) < 1) {
+                            const currentAngle = Math.atan2(vertices[i - 1].y - pos.y, vertices[i - 1].x - pos.x);
+                            const newAngle = Math.atan2(vertices[i].y - pos.y, vertices[i].x - pos.x);
+                            ctx.arc(pos.x, pos.y, radius, currentAngle, newAngle);
+                        } else {
+                            ctx.lineTo(vertices[i].x, vertices[i].y)
+                        }
+                    }
+                    newDistance = Math.sqrt((vertices[0].x - pos.x) ** 2 + (vertices[0].y - pos.y) ** 2);
+                    currentDistance = Math.sqrt((vertices[vertices.length - 1].x - pos.x) ** 2 + (vertices[vertices.length - 1].y - pos.y) ** 2);
+                    if (Math.abs(currentDistance - radius) < 1 && Math.abs(newDistance - radius) < 1) {
+                        const currentAngle = Math.atan2(vertices[vertices.length - 1].y - pos.y, vertices[vertices.length - 1].x - pos.x);
+                        const newAngle = Math.atan2(vertices[0].y - pos.y, vertices[0].x - pos.x);
+                        ctx.arc(pos.x, pos.y, radius, currentAngle, newAngle);
+                    } else {
+                        ctx.lineTo(vertices[0].x, vertices[0].y)
+                    }
+
+                    // outline map edges, best with lighter colored document.body.style.backgroundColor
+                    ctx.strokeStyle = "#000";
+                    ctx.lineWidth = 5;
+                    ctx.stroke(simulation.draw.mapPath);
+
+                    ctx.globalCompositeOperation = "destination-in";
+                    ctx.fillStyle = "#000";
+                    ctx.fill();
+                    ctx.globalCompositeOperation = "source-over";
+
+                    // make map visible
+                    // ctx.fill(simulation.draw.mapPath);
+                    // ctx.fillStyle = "#000";
+
+                    ctx.clip(); //this doesn't seem to be required, but it helps with performance, probably stops the canvas context from drawing the whole map
+                }
+            }
         },
         body() {
             ctx.beginPath();
@@ -1510,10 +1816,10 @@ const simulation = {
                 const y = round(simulation.constructMouseDownPosition.y)
                 const dx = Math.max(25, round(simulation.mouseInGame.x) - x)
                 const dy = Math.max(25, round(simulation.mouseInGame.y) - y)
-                console.log(e.button)
+                // console.log(e.button)
                 if (e.button === 1) {
                     if (level.isProcedural) {
-                        simulation.outputMapString(`spawn.randomMob(x+${x}, y+${y}, 0);\n`);
+                        simulation.outputMapString(`spawn.randomMob(x+${x}, ${y}, 0);\n`);
                     } else {
                         simulation.outputMapString(`spawn.randomMob(${x}, ${y}, 0);\n`);
                     }
@@ -1522,7 +1828,7 @@ const simulation = {
                 } else if (simulation.mouseInGame.x > simulation.constructMouseDownPosition.x && simulation.mouseInGame.y > simulation.constructMouseDownPosition.y) { //make sure that the width and height are positive
                     if (e.button === 0) { //add map
                         if (level.isProcedural) {
-                            simulation.outputMapString(`spawn.mapRect(x+${x}, y+${y}, ${dx}, ${dy});\n`);
+                            simulation.outputMapString(`spawn.mapRect(x+${x}, ${y}, ${dx}, ${dy});\n`);
                         } else {
                             simulation.outputMapString(`spawn.mapRect(${x}, ${y}, ${dx}, ${dy});\n`);
                         }
@@ -1536,17 +1842,12 @@ const simulation = {
                         simulation.draw.setPaths() //update map graphics
                     } else if (e.button === 2) { //add body
                         if (level.isProcedural) {
-                            simulation.outputMapString(`spawn.bodyRect(x+${x}, y+${y}, ${dx}, ${dy});\n`);
+                            simulation.outputMapString(`spawn.bodyRect(x+${x}, ${y}, ${dx}, ${dy});\n`);
                         } else {
                             simulation.outputMapString(`spawn.bodyRect(${x}, ${y}, ${dx}, ${dy});\n`);
                         }
                         //see map in world
                         spawn.bodyRect(x, y, dx, dy);
-                        len = body.length - 1
-                        body[len].collisionFilter.category = cat.body;
-                        body[len].collisionFilter.mask = cat.player | cat.map | cat.body | cat.bullet | cat.mob | cat.mobBullet
-                        Composite.add(engine.world, body[len]); //add to world
-                        body[len].classType = "body"
                     }
                 }
             }
@@ -1589,9 +1890,9 @@ const simulation = {
             outHTML += "<div>" + simulation.constructMapString[i] + "</div>"
         }
         console.log(out)
-        navigator.clipboard.writeText(out).then(function() {
+        navigator.clipboard.writeText(out).then(function () {
             /* clipboard successfully set */
-        }, function() {
+        }, function () {
             /* clipboard write failed */
             console.log('copy failed')
         });
